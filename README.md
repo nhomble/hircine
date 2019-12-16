@@ -1,5 +1,5 @@
 # hircine
-hombros IRC in every (lang)
+hombros IRC in everything
 
 ### Why
 Toy projects help me learn thing including new paradigms, frameworks, and languages. I always get stuck thinking of something dumb to write 
