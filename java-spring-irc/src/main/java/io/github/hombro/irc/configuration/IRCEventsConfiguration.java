@@ -14,7 +14,7 @@ public class IRCEventsConfiguration {
     private IRCServerEventPublisher publisher;
 
     @Async("asyncExecutor")
-    @Scheduled(initialDelay = 500, fixedDelay = 500)
+    @Scheduled(initialDelay = 2000, fixedDelay = 500)
     void checkIRC() {
         publisher.check();
     }

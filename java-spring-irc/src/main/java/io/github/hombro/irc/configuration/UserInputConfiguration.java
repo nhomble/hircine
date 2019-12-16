@@ -8,10 +8,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.scheduling.config.ScheduledTaskRegistrar;
-import org.springframework.scheduling.config.TaskExecutorFactoryBean;
 
 @Import({
         ScheduleConfiguration.class,
@@ -27,13 +24,13 @@ public class UserInputConfiguration {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(1);
         executor.setMaxPoolSize(1);
-        executor.setThreadNamePrefix("user-input-tasl");
+        executor.setThreadNamePrefix("user-input-task");
         executor.setAwaitTerminationSeconds(1);
         return executor;
     }
 
     @Async("userInputExecutor")
-    @Scheduled(initialDelay = 1000, fixedDelay = 500)
+    @Scheduled(initialDelay = 2000, fixedDelay = 500)
     void handleInput() {
         publisher.handleInput();
     }

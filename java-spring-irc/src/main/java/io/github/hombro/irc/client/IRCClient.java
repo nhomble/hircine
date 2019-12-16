@@ -4,18 +4,14 @@ import org.springframework.beans.factory.InitializingBean;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.List;
 import java.util.Optional;
-import java.util.StringJoiner;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class IRCClient implements InitializingBean {
 
     private final String server;
     private final int port;
-    private final String channel;
 
+    private String channel;
     private String username;
     private String nickName;
 
@@ -32,14 +28,16 @@ public class IRCClient implements InitializingBean {
     }
 
     private void send(String cmd, String... msg) {
-        String joined = String.join(" ", msg);
-        String full = String.format("%s %s\r\n", cmd.toUpperCase(), joined);
+        if (!socket.isClosed()) {
+            String joined = String.join(" ", msg);
+            String full = String.format("%s %s\r\n", cmd.toUpperCase(), joined);
 
-        try {
-            writer.write(full);
-            writer.flush();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            try {
+                writer.write(full);
+                writer.flush();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -67,14 +65,25 @@ public class IRCClient implements InitializingBean {
         send("JOIN", channel);
     }
 
-    public List<String> listChannels(String server) {
+    public void listChannels(String server) {
         send("LIST", server);
-        return null;
     }
 
-    public List<String> listUsers(String channel) {
+    public void changeChannel(String channel) {
+        this.channel = channel;
+        join(channel);
+    }
+
+    public void listChannels() {
+        listChannels(server);
+    }
+
+    public void listUsers() {
+        listUsers(channel);
+    }
+
+    public void listUsers(String channel) {
         send("NAMES", channel);
-        return null;
     }
 
     public void setNickname(String nickname) {
@@ -85,20 +94,23 @@ public class IRCClient implements InitializingBean {
         send("PONG", server);
     }
 
-    private void login() throws IOException {
+    private void login() {
         send("NICK", nickName);
         send("USER", username, "8", "*", nickName);
 
-        String response = null;
-        while ((response = reader.readLine()) != null) {
-            if (response.contains("004")) {
-                break;
-            } else if (response.contains("443")) {
-                throw new RuntimeException("");
+        try {
+            String response = null;
+            while ((response = reader.readLine()) != null) {
+                if (response.contains("004")) {
+                    break;
+                } else if (response.contains("443")) {
+                    throw new RuntimeException(response);
+                }
             }
+            join(channel);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-
-        join(channel);
     }
 
     public Optional<String> check() {
@@ -123,5 +135,13 @@ public class IRCClient implements InitializingBean {
         login();
 
         Runtime.getRuntime().addShutdownHook(new Thread(this::quit));
+    }
+
+    public String getChannel(){
+        return channel;
+    }
+
+    public String getNickName(){
+        return nickName;
     }
 }

@@ -15,7 +15,6 @@ public class Application implements CommandLineRunner {
     @Autowired
     private IRCApplication application;
 
-
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
