@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: spring-events-irc
+  main:
+    web-application-type: none
+    banner-mode: off
+logging:
+  pattern:
+    console:
+  file:
+    name: ${spring.application.name}.log
+  level:
+    io.github.hombro: trace
+irc:
+  server: irc.freenode.net
+  port: 6667
+  channel: "#irchacks"
+  username: hombro
+  default-nick-name: hombro
